@@ -5,7 +5,7 @@ class Settings:
         # Screen settings
         self.screen_width = 640
         self.screen_height = 480
-        self.bg_color = (173, 216, 230)
+        self.bg_color = (112, 130, 26)
 
         # Ninja settings
-        self.ninja_speed = 1.5
+        self.ninja_speed = 3
