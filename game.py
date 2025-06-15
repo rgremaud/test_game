@@ -4,6 +4,7 @@ import pygame
 
 from settings import Settings
 from ninja import Ninja
+from ninja_star import Star
 
 class Game:
     """Overall class to manage game assets and behavior."""
@@ -18,6 +19,7 @@ class Game:
                                                self.settings.screen_height))
         pygame.display.set_caption("The Game")
         self.ninja = Ninja(self)
+        self.stars = pygame.sprite.Group()
 
     
     def run_game(self):
@@ -25,6 +27,7 @@ class Game:
         while True:
             self._check_events()
             self.ninja.update()
+            self._update_stars()
             self._update_screen()
             self.clock.tick(60)
     
@@ -47,6 +50,10 @@ class Game:
             self.ninja.moving_up = True
         elif event.key == pygame.K_DOWN:
             self.ninja.moving_down = True
+        elif event.key == pygame.K_q:
+            sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_star()
     
     def _check_keyup_events(self, event):
         if event.key == pygame.K_RIGHT:
@@ -57,10 +64,27 @@ class Game:
             self.ninja.moving_up = False
         elif event.key == pygame.K_DOWN:
             self.ninja.moving_down = False
+    
+    def _fire_star(self):
+        """Create a new star and add it to the star group."""
+        new_star = Star(self)
+        self.stars.add(new_star)
+
+    def _update_stars(self):
+        """Update position of stars and get rid of old stars"""
+        # Update star position
+        self.stars.update()
+
+        # Get rid of ninja stars that have disappeared.
+        for star in self.stars.copy():
+            if star.rect.right >= 640:
+                self.stars.remove(star)
 
     def _update_screen(self):
          """Updates images on the screen, and flip to the new screen."""
          self.screen.fill(self.settings.bg_color)
+         for star in self.stars.sprites():
+             star.draw_star()
          self.ninja.blitme()
 
          pygame.display.flip()

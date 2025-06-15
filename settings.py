@@ -9,3 +9,9 @@ class Settings:
 
         # Ninja settings
         self.ninja_speed = 3
+
+        # Ninja star settings
+        self.star_speed = 3.0
+        self.star_width = 15
+        self.star_height = 15
+        self.star_color = (200, 200, 200)
