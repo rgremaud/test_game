@@ -5,6 +5,8 @@ import pygame
 from settings import Settings
 from ninja import Ninja
 from ninja_star import Star
+from sky_star import Skystar
+from random import randint
 
 class Game:
     """Overall class to manage game assets and behavior."""
@@ -20,7 +22,9 @@ class Game:
         pygame.display.set_caption("The Game")
         self.ninja = Ninja(self)
         self.stars = pygame.sprite.Group()
+        self.skystars = pygame.sprite.Group()
 
+        self._create_sky()
     
     def run_game(self):
         """Start the main loop for the game."""
@@ -64,6 +68,30 @@ class Game:
             self.ninja.moving_up = False
         elif event.key == pygame.K_DOWN:
             self.ninja.moving_down = False
+
+    def _create_sky(self):
+        """Create a night sky."""
+        # Create a star and keep adding until no room is left.
+        # Spacing between star is two star width
+        skystar = Skystar(self)
+        skystar_width, skystar_height = skystar.rect.size
+
+        current_x, current_y= skystar_width * 2, skystar_height * 2
+        while current_y < (self.settings.screen_height - 15 * skystar_height):
+            while current_x < (self.settings.screen_width - 2 * skystar_width):
+                self._create_skystar(current_x, current_y)
+                current_x += randint(30, 40)
+            # Finished a row; reset x value and increment y value.
+            current_x = skystar_width * 2
+            current_y += randint(40, 60)
+    
+    def _create_skystar(self, x_position, y_position):
+        """Create a skystar and place it in the row."""
+        new_skystar = Skystar(self)
+        new_skystar.x = x_position
+        new_skystar.rect.x = x_position
+        new_skystar.rect.y = y_position
+        self.skystars.add(new_skystar)
     
     def _fire_star(self):
         """Create a new star and add it to the star group."""
@@ -86,6 +114,7 @@ class Game:
          for star in self.stars.sprites():
              star.draw_star()
          self.ninja.blitme()
+         self.skystars.draw(self.screen)
 
          pygame.display.flip()
 
