@@ -6,6 +6,7 @@ from settings import Settings
 from ninja import Ninja
 from ninja_star import Star
 from sky_star import Skystar
+from badguy import Badguy
 from random import randint
 
 class Game:
@@ -23,8 +24,10 @@ class Game:
         self.ninja = Ninja(self)
         self.stars = pygame.sprite.Group()
         self.skystars = pygame.sprite.Group()
+        self.badguys = pygame.sprite.Group()
 
         self._create_sky()
+        self._create_badguys()
     
     def run_game(self):
         """Start the main loop for the game."""
@@ -33,6 +36,7 @@ class Game:
             self.ninja.update()
             self._update_stars()
             self._update_screen()
+            self._update_badguys()
             self.clock.tick(60)
     
     def _check_events(self):
@@ -68,6 +72,18 @@ class Game:
             self.ninja.moving_up = False
         elif event.key == pygame.K_DOWN:
             self.ninja.moving_down = False
+    
+    def _check_badguy_edges(self):
+        """Respond appropriately when badguy hit edge"""
+        for badguy in self.badguys.sprites():
+            if badguy.check_edges():
+                self._change_badguy_direction()
+                break
+    
+    def _change_badguy_direction(self):
+        """Change the badguy's direction"""
+        for badguy in self.badguys.sprites():
+            self.settings.badguy_direction *= -1
 
     def _create_sky(self):
         """Create a night sky."""
@@ -77,7 +93,7 @@ class Game:
         skystar_width, skystar_height = skystar.rect.size
 
         current_x, current_y= skystar_width * 2, skystar_height * 2
-        while current_y < (self.settings.screen_height - 15 * skystar_height):
+        while current_y < (self.settings.screen_height - 20 * skystar_height):
             while current_x < (self.settings.screen_width - 2 * skystar_width):
                 self._create_skystar(current_x, current_y)
                 current_x += randint(30, 40)
@@ -92,7 +108,13 @@ class Game:
         new_skystar.rect.x = x_position
         new_skystar.rect.y = y_position
         self.skystars.add(new_skystar)
-    
+
+    def _create_badguys(self):
+        """Create badguys"""
+        # Make a badguy
+        badguy = Badguy(self)
+        self.badguys.add(badguy)
+
     def _fire_star(self):
         """Create a new star and add it to the star group."""
         new_star = Star(self)
@@ -102,11 +124,16 @@ class Game:
         """Update position of stars and get rid of old stars"""
         # Update star position
         self.stars.update()
-
+        self._update_badguys()
         # Get rid of ninja stars that have disappeared.
         for star in self.stars.copy():
             if star.rect.right >= 640:
                 self.stars.remove(star)
+    
+    def _update_badguys(self):
+        """Update the position of the badguy"""
+        self.badguys.update()
+        self._check_badguy_edges()
 
     def _update_screen(self):
          """Updates images on the screen, and flip to the new screen."""
@@ -114,6 +141,7 @@ class Game:
          for star in self.stars.sprites():
              star.draw_star()
          self.ninja.blitme()
+         self.badguys.draw(self.screen)
          self.skystars.draw(self.screen)
 
          pygame.display.flip()

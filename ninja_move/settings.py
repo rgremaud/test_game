@@ -15,3 +15,7 @@ class Settings:
         self.star_width = 15
         self.star_height = 15
         self.star_color = (200, 200, 200)
+
+        # Badguy settings
+        self.badguy_speed = 3
+        self.badguy_direction = 1
