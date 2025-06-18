@@ -19,3 +19,4 @@ class Settings:
         # Badguy settings
         self.badguy_speed = 3
         self.badguy_direction = 1
+        self.badguy_life = 20

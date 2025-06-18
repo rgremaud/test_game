@@ -8,6 +8,7 @@ from ninja_star import Star
 from sky_star import Skystar
 from badguy import Badguy
 from random import randint
+from game_stats import GameStats
 
 class Game:
     """Overall class to manage game assets and behavior."""
@@ -17,7 +18,7 @@ class Game:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
-
+        
         self.screen = pygame.display.set_mode((self.settings.screen_width,
                                                self.settings.screen_height))
         pygame.display.set_caption("The Game")
@@ -26,17 +27,23 @@ class Game:
         self.skystars = pygame.sprite.Group()
         self.badguys = pygame.sprite.Group()
 
+        self.stats = GameStats(self)
+
         self._create_sky()
         self._create_badguys()
+        self.game_active = True
     
     def run_game(self):
         """Start the main loop for the game."""
         while True:
             self._check_events()
-            self.ninja.update()
-            self._update_stars()
+
+            if self.game_active:
+                self.ninja.update()
+                self._update_stars()
+                self._update_badguys()
+
             self._update_screen()
-            self._update_badguys()
             self.clock.tick(60)
     
     def _check_events(self):
@@ -129,6 +136,18 @@ class Game:
         for star in self.stars.copy():
             if star.rect.right >= 640:
                 self.stars.remove(star)
+        
+        # Check if any ninjastars have hit the bad guy
+        self._ninja_hit()
+    
+    def _ninja_hit(self):
+        """Check if red ninja has been hit"""
+        if self.stats.badguy_life_left > 0:
+            if pygame.sprite.groupcollide(self.stars, self.badguys, True, False):
+                self.stats.badguy_life_left -= 1
+        else:
+            self.game_active = False
+            print("Congratulations.  You defeated the red ninja!")
     
     def _update_badguys(self):
         """Update the position of the badguy"""
