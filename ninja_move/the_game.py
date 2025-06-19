@@ -9,6 +9,7 @@ from sky_star import Skystar
 from badguy import Badguy
 from random import randint
 from game_stats import GameStats
+from button import Button
 
 class Game:
     """Overall class to manage game assets and behavior."""
@@ -31,7 +32,10 @@ class Game:
 
         self._create_sky()
         self._create_badguys()
-        self.game_active = True
+        self.game_active = False
+
+        # Make the play button.
+        self.play_button = Button(self, "Play")
     
     def run_game(self):
         """Start the main loop for the game."""
@@ -55,7 +59,24 @@ class Game:
                     self._check_keydown_events(event)
                 elif event.type == pygame.KEYUP:
                     self._check_keyup_events(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    self._check_play_button(mouse_pos)
     
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks Play."""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active:
+            # Reset the game statistics
+            self.stats.reset_stats()
+            self.game_active = True
+
+            # Get rid of any remaining ninja stars
+            self.stars.empty()
+
+            # Hide the mouse cursor.
+            pygame.mouse.set_visible(False)
+
     def _check_keydown_events(self, event):
         if event.key == pygame.K_RIGHT:
             self.ninja.moving_right = True
@@ -147,6 +168,7 @@ class Game:
                 self.stats.badguy_life_left -= 1
         else:
             self.game_active = False
+            pygame.mouse.set_visible(True)
             print("Congratulations.  You defeated the red ninja!")
     
     def _update_badguys(self):
@@ -162,6 +184,10 @@ class Game:
          self.ninja.blitme()
          self.badguys.draw(self.screen)
          self.skystars.draw(self.screen)
+
+         # Draw play button if the game is inactive.
+         if not self.game_active:
+             self.play_button.draw_button()
 
          pygame.display.flip()
 
