@@ -30,12 +30,17 @@ class Formula1:
         while True:
             self._check_events()
             self._update_screen()
-            self.racecar.update()
+            self._update_racecar()
+            self._update_barrier()
             self.clock.tick(60)
     
     def _update_racecar(self):
         """Update the car's movement"""
         self.racecar.update()
+    
+    def _update_barrier(self):
+        """Update the barrier's movement"""
+        self.barrier.update()
     
     def _check_events(self):
         """Respond to keypresses and mouse events"""

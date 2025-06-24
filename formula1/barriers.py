@@ -13,12 +13,28 @@ class Barrier(Sprite):
         self.screen_rect = race_day.screen.get_rect()
 
         # Load the barrier image and get its rect
-        self.image = pygame.image.load('images/barrier.bmp')
-        self.rect = self.image.get_rect()
+        self.top_image = pygame.image.load('images/barrier.bmp')
+        self.top_rect = self.top_image.get_rect()
+
+        self.bottom_image = pygame.image.load('images/barrier.bmp')
+        self.bottom_rect = self.bottom_image.get_rect()
         
         # Start the rectangle at the top left
-        self.rect.x, self.rect.y = 295, random.randint(-500, -325)
+        self.top_rect.x, self.top_rect.y = 295, random.randint(-500, -325)
+        self.bottom_rect.x, self.bottom_rect.y = 295, random.randint(325, 500)
+
+        # Store a float for the barrier's exact x position
+        self.top_x = float(self.top_rect.x)
+        self.bottom_x = float(self.bottom_rect.x)
+    
+    def update(self):
+        """Move the racecar down the screen"""
+        self.top_x -= self.settings.barrier_speed
+        self.top_rect.x = self.top_x
+        self.bottom_x -= self.settings.barrier_speed
+        self.bottom_rect.x = self.bottom_x
 
     def blitme(self):
         """Draw the barrier at its current location"""
-        self.screen.blit(self.image, self.rect)
+        self.screen.blit(self.top_image, self.top_rect)
+        self.screen.blit(self.bottom_image, self.bottom_rect)
