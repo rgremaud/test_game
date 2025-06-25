@@ -25,3 +25,7 @@ class Settings:
         self.racecar_gravity *= self.speedup_scale
         if self.racecar_jump <= 75:
             self.racecar_jump *= self.speedup_scale
+    
+    def increase_barrier_speed(self):
+        self.barrier_speed = .5
+        print("GO FASTER!")
